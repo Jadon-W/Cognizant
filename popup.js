@@ -11,6 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
     startMemoryTest(level);
   });
 
+  document.getElementById("startReactionTest").addEventListener("click", () => {
+    startReactionTest();
+  });
+  
+
   document.getElementById("saveSettings").addEventListener("click", () => {
     const reminderThreshold = parseInt(document.getElementById("reminderThreshold").value);
     chrome.storage.local.set({ reminderThreshold: reminderThreshold }, () => {
@@ -100,6 +105,38 @@ function startMemoryTest(level) {
     displayInputModal(selectedWords, inputTime, level, "memory");
   });
 }
+function startReactionTest() {
+  const modal = document.createElement("div");
+  modal.id = "reactionModal";
+  modal.className = "modal";
+
+  modal.innerHTML = `
+    <div class="modal-content">
+      <h2>Get Ready!</h2>
+      <p>Click as soon as you see the screen change color.</p>
+      <button id="reactionStart">Start Reaction Test</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  document.getElementById("reactionStart").addEventListener("click", () => {
+    document.getElementById("reactionStart").style.display = "none";
+    setTimeout(() => {
+      const startTime = new Date().getTime();
+      document.querySelector(".modal-content").style.backgroundColor = "#00ff00"; // Change color
+
+      document.querySelector(".modal-content").addEventListener("click", () => {
+        const endTime = new Date().getTime();
+        const reactionTime = endTime - startTime;
+
+        alert(`Your reaction time: ${reactionTime} ms`);
+        saveTestResult("reaction", { reactionTime: reactionTime });
+        closeModal();
+      });
+    }, Math.floor(Math.random() * 3000) + 1000); // Random delay between 1 and 4 seconds
+  });
+}
 function displayInputModal(correctSequence, inputTime, level, testType) {
   const modal = document.createElement("div");
   modal.id = "inputModal";
@@ -110,8 +147,8 @@ function displayInputModal(correctSequence, inputTime, level, testType) {
       <h2>Input Phase</h2>
       <p>Enter your answer below:</p>
       <input type="text" id="userInput" placeholder="e.g., 1,2,3">
-      <button id="submitInput">Submit</button>
-      <div id="inputTimer">Time left: ${inputTime}s</div>
+      <div id="inputTimer" style="font-size: 1.2em; color: #ff4f91; margin-top: 10px;">Time left: ${inputTime}s</div>
+      <button id="submitInput" style="margin-top: 15px;">Submit</button>
     </div>
   `;
 
@@ -121,23 +158,31 @@ function displayInputModal(correctSequence, inputTime, level, testType) {
   // Timer for input phase
   const intervalId = setInterval(() => {
     const timerElement = document.getElementById("inputTimer");
-    timerElement.textContent = `Time left: ${remainingTime}s`;
+    if (timerElement) {
+      timerElement.textContent = `Time left: ${remainingTime}s`;
+    }
 
     if (remainingTime <= 0) {
       clearInterval(intervalId);
       handleInputSubmission(null, correctSequence, testType, remainingTime);
-      closeModal();
+      closeModal(); // Close the modal if the time runs out
     } else {
       remainingTime--;
     }
   }, 1000);
 
+  // Prevent multiple submissions
+  let hasSubmitted = false;
+
   // Handle input submission
   document.getElementById("submitInput").addEventListener("click", () => {
-    const userResponse = document.getElementById("userInput").value;
-    handleInputSubmission(userResponse, correctSequence, testType, remainingTime);
-    clearInterval(intervalId); // Stop the timer after submission
-    closeModal();
+    if (!hasSubmitted) {
+      hasSubmitted = true;
+      const userResponse = document.getElementById("userInput").value;
+      handleInputSubmission(userResponse, correctSequence, testType, remainingTime);
+      clearInterval(intervalId); // Stop the timer after submission
+      closeModal(); // Close the modal after submission
+    }
   });
 }
 
@@ -157,6 +202,12 @@ function handleInputSubmission(userResponse, correctSequence, testType, remainin
     saveTestResult(testType, { correctSequence, userResponse, correctCount, score, bonus, totalScore });
   } else {
     alert("No input provided. Please try again.");
+  }
+}
+function closeModal() {
+  const modal = document.getElementById("inputModal");
+  if (modal) {
+    document.body.removeChild(modal);
   }
 }
 
