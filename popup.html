@@ -2,12 +2,74 @@
 <html>
 <head>
   <title>Cognizant</title>
+  <style>
+    .test-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 15px;
+      width: 300px;
+      text-align: center;
+      background-color: #f9f9f9;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    #timer {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+  <link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
 <body>
   <h1>Welcome to Cognizant</h1>
-  <button id="startAssessment">Start Assessment</button>
-  <button id="startFocusTest">Take a Focus Test</button>
-  <button id="startMemoryTest">Take a Memory Test</button>
+
+  <div class="test-card">
+    <h3>Focus Test</h3>
+    <label for="focus-level">Choose Difficulty:</label>
+    <select id="focus-level">
+      <option value="Beginner">Beginner</option>
+      <option value="Intermediate">Intermediate</option>
+      <option value="Advanced">Advanced</option>
+    </select>
+    <button id="startFocusTest">Start Test</button>
+  </div>
+
+  <div class="test-card">
+    <h3>Memory Test</h3>
+    <label for="memory-level">Choose Difficulty:</label>
+    <select id="memory-level">
+      <option value="Beginner">Beginner</option>
+      <option value="Intermediate">Intermediate</option>
+      <option value="Advanced">Advanced</option>
+    </select>
+    <button id="startMemoryTest">Start Test</button>
+  </div>
+
+  <div class="test-card">
+  <h3>Reaction Time Test</h3>
+  <p>Test how quickly you react to visual cues.</p>
+  <label for="reaction-level">Choose Difficulty:</label>
+  <select id="reaction-level">
+    <option value="Beginner">Beginner</option>
+    <option value="Intermediate">Intermediate</option>
+    <option value="Advanced">Advanced</option>
+  </select>
+  <button id="startReactionTest">Start Test</button>
+</div>
+
+  <div class="test-card">
+    <h3>Stroop Task</h3>
+    <p>Identify colors, not words, as fast as possible!</p>
+    <button id="startStroopTask">Start Test</button>
+  </div>
+
+  <div class="test-card">
+    <h3>Abstract Reasoning Test</h3>
+    <p>Solve analogies and pattern problems to test your reasoning skills.</p>
+    <button id="startReasoningTest">Start Test</button>
+  </div>
 
   <h2>Session Goal</h2>
   <select id="sessionGoal">
@@ -23,10 +85,10 @@
   <button id="saveSettings">Save Settings</button>
 
   <h2>Custom Blocking Settings</h2>
-<label for="blockedSites">Enter sites to block or monitor (comma separated):</label>
-<input type="text" id="blockedSites" placeholder="e.g., facebook.com, youtube.com">
-<button id="saveBlockedSites">Save Blocked Sites</button>
+  <label for="blockedSites">Enter sites to block or monitor (comma separated):</label>
+  <input type="text" id="blockedSites" placeholder="e.g., facebook.com, youtube.com">
+  <button id="saveBlockedSites">Save Blocked Sites</button>
 
-  <script src="popup.js"></script>
+  <script type="module" src="popup.js"></script>
 </body>
 </html>
