@@ -1,0 +1,192 @@
+/* General styling */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #1f1c47, #3d47a0);
+  color: #fff;
+  margin: 0;
+  padding: 0;  /* Removed padding to align everything properly */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;  /* Changed to flex-start to keep content visible from the top */
+  height: 100vh;
+  overflow: hidden; 
+  overflow-y: auto;  /* Allow scrolling for the entire content */
+  min-width: 400px; 
+  min-height: 600px;
+  box-sizing: border-box;
+}
+
+/* Container to wrap content for better scrolling experience */
+#content-wrapper {
+  width: 100%;
+  max-width: 500px;  /* Constrain the max width for better layout */
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;  /* Allow the wrapper to be scrollable */
+}
+
+/* Header Styling */
+h1, h2 {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  color: #00d4ff;
+  font-size: 2.5em;
+  margin-top: 20px; /* Added top margin to space from the top of the popup */
+}
+
+h2 {
+  color: #32ffa8;
+  font-size: 1.8em;
+}
+
+/* Button Styling */
+button {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  border: none;
+  color: white;
+  font-size: 1em;
+  padding: 10px 20px;
+  margin-top: 15px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 15px 20px rgba(0, 114, 255, 0.4);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+/* Test Cards Styling */
+.test-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  margin: 15px;
+  width: 100%;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  transition: all 0.3s ease-in-out;
+  text-align: center;
+  min-height: 200px;
+}
+
+.test-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.45);
+}
+
+/* Labels & Select Boxes */
+label {
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+select {
+  padding: 5px;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+}
+
+/* Timer Styling */
+#timer {
+  font-size: 2em;
+  font-weight: bold;
+  color: #ff4f91;
+  margin-top: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Input & Settings Styling */
+input[type="number"], input[type="text"] {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+  width: calc(100% - 20px);
+  margin-bottom: 10px;
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus {
+  outline: none;
+  transform: scale(1.05);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* Memorization Message Styling */
+#memorizationMessage {
+  font-size: 1.5em;
+  color: #ffffff;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  margin: 20px auto;
+  border-radius: 15px;
+  max-width: 80%;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  width: 300px;
+  text-align: center;
+}
+
+.modal-content {
+  color: #000;  // Ensures text is visible on colored backgrounds
+  font-size: 1.5em;
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.modal-content h2, .modal-content p {
+  background: rgba(0, 0, 0, 0.6); /* Darker background to ensure visibility */
+  color: #ffffff;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+
+.modal-content h2 {
+  font-size: 1.5em;
+}
+
+.modal-content p {
+  font-size: 1.1em;
+}
