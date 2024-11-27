@@ -12,9 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("startReactionTest").addEventListener("click", () => {
-    startReactionTest();
+    const level = document.getElementById("reaction-level").value;
+    startReactionTest(level);
   });
-  
 
   document.getElementById("saveSettings").addEventListener("click", () => {
     const reminderThreshold = parseInt(document.getElementById("reminderThreshold").value);
@@ -105,37 +105,130 @@ function startMemoryTest(level) {
     displayInputModal(selectedWords, inputTime, level, "memory");
   });
 }
-function startReactionTest() {
+function startReactionTest(level) {
+  const numRounds = level === "Beginner" ? 5 : level === "Intermediate" ? 7 : 10;
+  const minDelay = level === "Beginner" ? 1000 : level === "Intermediate" ? 500 : 300;
+  const maxDelay = level === "Beginner" ? 3000 : level === "Intermediate" ? 2500 : 2000;
+
+  let round = 0;
+  let reactionTimes = [];
+  let streakCount = 0;
+  let streakBonus = 0;
+  let incorrectClickPenalty = 0;
+
   const modal = document.createElement("div");
   modal.id = "reactionModal";
   modal.className = "modal";
 
   modal.innerHTML = `
     <div class="modal-content">
-      <h2>Get Ready!</h2>
-      <p>Click as soon as you see the screen change color.</p>
-      <button id="reactionStart">Start Reaction Test</button>
+      <h2>Reaction Test - Round 1 of ${numRounds}</h2>
+      <p>Click as soon as you see the screen turn green.</p>
+      <button id="reactionStart">Start Round</button>
     </div>
   `;
-
   document.body.appendChild(modal);
 
   document.getElementById("reactionStart").addEventListener("click", () => {
     document.getElementById("reactionStart").style.display = "none";
+
+    // Set a timeout to start the actual test after a delay
     setTimeout(() => {
-      const startTime = new Date().getTime();
-      document.querySelector(".modal-content").style.backgroundColor = "#00ff00"; // Change color
+      const modalContent = document.querySelector(".modal-content");
 
-      document.querySelector(".modal-content").addEventListener("click", () => {
-        const endTime = new Date().getTime();
-        const reactionTime = endTime - startTime;
+      if (level === "Advanced") {
+        // Advanced level: multiple red flashes before green
+        const redFlashCount = Math.floor(Math.random() * 3) + 1; // Random flashes between 1 and 3
+        let flashCount = 0;
 
-        alert(`Your reaction time: ${reactionTime} ms`);
-        saveTestResult("reaction", { reactionTime: reactionTime });
-        closeModal();
-      });
-    }, Math.floor(Math.random() * 3000) + 1000); // Random delay between 1 and 4 seconds
+        const flashInterval = setInterval(() => {
+          if (flashCount < redFlashCount) {
+            modalContent.style.backgroundColor = "#ff0000"; // Red
+            setTimeout(() => {
+              modalContent.style.backgroundColor = ""; // Clear color after a short time
+            }, 200);
+            flashCount++;
+          } else {
+            clearInterval(flashInterval);
+            startReaction(modalContent);
+          }
+        }, 500);
+      } else {
+        startReaction(modalContent);
+      }
+    }, Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay);
   });
+
+  function startReaction(modalContent) {
+    const startTime = new Date().getTime();
+    modalContent.style.backgroundColor = "#00ff00"; // Green
+
+    modalContent.addEventListener("click", function handleClick(event) {
+      const endTime = new Date().getTime();
+      const reactionTime = endTime - startTime;
+      reactionTimes.push(reactionTime);
+
+      // Remove the event listener for this round
+      this.removeEventListener("click", handleClick);
+
+      // Update streak count based on reaction time
+      if (reactionTime < 210) {
+        streakCount++;
+        streakBonus += 10; // Reward for maintaining fast streaks
+      } else {
+        streakCount = 0;
+      }
+
+      // Update round and proceed
+      round++;
+      if (round < numRounds) {
+        updateRound(modal, round, numRounds);
+      } else {
+        finalizeReactionTest(reactionTimes, streakBonus, incorrectClickPenalty);
+        closeModal("reactionModal");
+      }
+    });
+
+    // Add a listener for incorrect clicks during the red phase
+    modalContent.addEventListener("click", function handleIncorrectClick(event) {
+      if (modalContent.style.backgroundColor === "#ff0000") {
+        incorrectClickPenalty += 10; // Penalize for clicking during red phase
+        alert("Incorrect! You clicked during the distraction phase. Points deducted.");
+      }
+    });
+  }
+}
+function updateRound(modal, round, numRounds) {
+  modal.querySelector("h2").textContent = `Reaction Test - Round ${round + 1} of ${numRounds}`;
+  document.getElementById("reactionStart").style.display = "block";
+  document.querySelector(".modal-content").style.backgroundColor = ""; // Reset color
+}
+function finalizeReactionTest(reactionTimes, streakBonus, incorrectClickPenalty) {
+  // Calculate average reaction time
+  const averageReactionTime = reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length;
+
+  // Scoring: The lower the reaction time, the higher the score.
+  // Reaction times below 250ms are scored higher, and bonuses are awarded for times below 210ms.
+  let score = 0;
+  if (averageReactionTime <= 250) {
+    score = Math.min(100, Math.round((250 - averageReactionTime) * 0.4 + 50));
+  } else {
+    score = Math.max(0, 50 - Math.round((averageReactionTime - 250) * 0.4));
+  }
+
+  // Calculate total score, including streak bonus and penalty
+  const totalScore = Math.max(0, score + streakBonus - incorrectClickPenalty);
+
+  // Display feedback to the user
+  const performanceMessage = averageReactionTime <= 210
+    ? "Excellent! Your reaction times are well above average."
+    : averageReactionTime <= 250
+      ? "Good job! You are performing above the average range."
+      : "Keep practicing! Your reaction time can still improve.";
+
+  alert(`Your average reaction time: ${averageReactionTime.toFixed(2)} ms\nScore: ${score}\nStreak Bonus: ${streakBonus}\nIncorrect Click Penalty: ${incorrectClickPenalty}\nTotal Score: ${totalScore}\n\n${performanceMessage}`);
+
+  saveTestResult("reaction", { reactionTimes, averageReactionTime, score, streakBonus, incorrectClickPenalty, totalScore });
 }
 function displayInputModal(correctSequence, inputTime, level, testType) {
   const modal = document.createElement("div");
@@ -204,8 +297,8 @@ function handleInputSubmission(userResponse, correctSequence, testType, remainin
     alert("No input provided. Please try again.");
   }
 }
-function closeModal() {
-  const modal = document.getElementById("inputModal");
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
   if (modal) {
     document.body.removeChild(modal);
   }
